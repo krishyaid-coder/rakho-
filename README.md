@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-lockup-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo-lockup.svg">
-    <img src="docs/assets/logo-lockup.svg" alt="Rakho" width="280">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/wordmark-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/wordmark.svg">
+    <img src="docs/assets/wordmark.svg" alt="Rakho" width="280">
   </picture>
 </p>
 
