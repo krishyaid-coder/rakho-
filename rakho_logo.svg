@@ -1,0 +1,44 @@
+<svg viewBox="0 0 820 560" xmlns="http://www.w3.org/2000/svg" font-family="Poppins, 'Century Gothic', Futura, system-ui, sans-serif">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&amp;family=Noto+Sans+Devanagari:wght@500;600&amp;display=swap');
+      .ink { fill: #1c1b19; }
+      .saffron { fill: #e0863c; }
+      .muted { fill: #8d8475; }
+      .deva { font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Devanagari MT', serif; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="560" rx="28" fill="#f6f3ec"/>
+
+  <!-- ============ PRIMARY LOCKUP ============ -->
+  <!-- mark: the native-script initial of the name -->
+  <text x="150" y="212" class="ink deva" font-size="155" font-weight="600">र</text>
+  <!-- bindu: the saffron accent, placed where a Devanagari dot sits -->
+  <circle cx="212" cy="92" r="10" class="saffron"/>
+
+  <!-- wordmark -->
+  <text x="322" y="190" font-size="98" font-weight="600" letter-spacing="0.5" class="ink">rakho</text>
+  <circle cx="602" cy="186" r="8" class="saffron"/>
+  <text x="324" y="228" font-size="18" letter-spacing="0.5" class="muted">safe memory for agents</text>
+
+  <!-- divider -->
+  <line x1="80" y1="304" x2="740" y2="304" stroke="#e5dfd2" stroke-width="2"/>
+
+  <!-- ============ MARK TREATMENTS ============ -->
+  <!-- 1. monogram -->
+  <text x="180" y="442" class="ink deva" font-size="118" font-weight="600" text-anchor="middle">र</text>
+  <circle cx="200" cy="352" r="7" class="saffron"/>
+  <text x="180" y="486" font-size="14" letter-spacing="1" text-anchor="middle" class="muted">monogram</text>
+
+  <!-- 2. app icon -->
+  <rect x="365" y="348" width="90" height="90" rx="22" class="ink"/>
+  <text x="410" y="422" class="deva" font-size="74" font-weight="600" text-anchor="middle" fill="#f6f3ec">र</text>
+  <circle cx="432" cy="368" r="5" class="saffron"/>
+  <text x="410" y="486" font-size="14" letter-spacing="1" text-anchor="middle" class="muted">app icon</text>
+
+  <!-- 3. bookmark (keep this place) -->
+  <path d="M620,350 H660 V432 L640,415 L620,432 Z" fill="none" stroke="#1c1b19" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="640" cy="373" r="7" class="saffron"/>
+  <text x="640" y="486" font-size="14" letter-spacing="1" text-anchor="middle" class="muted">bookmark</text>
+</svg>
