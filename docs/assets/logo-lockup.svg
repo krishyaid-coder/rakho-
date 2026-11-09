@@ -1,7 +1,5 @@
-<svg viewBox="70 40 680 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rakho" font-family="Poppins, 'Century Gothic', Futura, system-ui, sans-serif">
+<svg viewBox="0 0 360 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rakho">
   <title>Rakho</title>
-  <text x="150" y="212" fill="#1c1b19" font-family="'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Devanagari MT', serif" font-size="155" font-weight="600">र</text>
-  <circle cx="212" cy="92" r="10" fill="#e0863c"/>
-  <text x="322" y="190" font-size="98" font-weight="600" letter-spacing="0.5" fill="#1c1b19">rakho</text>
-  <circle cx="602" cy="186" r="8" fill="#e0863c"/>
+  <text x="18" y="96" font-family="Montserrat, Poppins, system-ui, sans-serif" font-size="90" font-weight="700" letter-spacing="-1" fill="#1c1b19">rakho</text>
+  <circle cx="330" cy="90" r="9" fill="#e0863c"/>
 </svg>
