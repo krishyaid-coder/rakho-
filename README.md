@@ -207,6 +207,10 @@ Empty stored + empty refused means it actually forgot, including the vectors.
 
 ## Demo agent: PayPal invoices
 
+Silent 42s walkthrough of the run below — poison, origin block, Hindi keep / English `nikaalo`, `dekho`, 256d embeddings, `bhoolo`. Click the still to play.
+
+[![Krishy's PayPal × Sluice × Rakho use case](docs/assets/rakho-usecase-poster.png)](docs/assets/rakho-usecase.mp4)
+
 Same use case as [PayPal-Hackathon-x-sluice](https://github.com/krishyaid-coder/PayPal-Hackathon-x-sluice): an agent reads an invoice, then tries to pay.
 
 - Poisoned invoice (`Ignore previous instructions` + attacker payee) → Rakho **refuses to keep it**. Origin fingerprints the payee. `create_invoice` is **blocked**. PayPal never sees the call.

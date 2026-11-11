@@ -1,5 +1,7 @@
 # Simulation: Krishy, PayPal agent, Sluice on, Rakho as the ledger
 
+Silent film of this run: [docs/assets/rakho-usecase.mp4](../../docs/assets/rakho-usecase.mp4).
+
 Replay:
 
 ```bash
