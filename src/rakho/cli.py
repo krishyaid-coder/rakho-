@@ -54,12 +54,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _open(args: argparse.Namespace) -> Rakho:
-    gate = None
-    if args.gate.strip().lower() == "sluice":
-        from rakho.sluice_gate import SluiceGate
-
-        gate = SluiceGate()
-    return Rakho(args.db, embedder=args.embedder, gate=gate)
+    try:
+        return Rakho(args.db, embedder=args.embedder, gate=args.gate)
+    except (ImportError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(2) from exc
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -69,11 +68,19 @@ def main(argv: list[str] | None = None) -> int:
     if not verb or verb in {"init", "welcome"}:
         print_banner()
         if verb == "init":
-            db = _open(args)
+            try:
+                db = _open(args)
+            except SystemExit as exc:
+                return int(exc.code or 2)
             db.close()
-            print(f"  notebook ready · {args.db}\n")
+            gate = args.gate.strip().lower()
+            extra = " · sluice on" if gate == "sluice" else ""
+            print(f"  notebook ready · {args.db}{extra}\n")
         return 0
-    db = _open(args)
+    try:
+        db = _open(args)
+    except SystemExit as exc:
+        return int(exc.code or 2)
     try:
         return _dispatch(db, args)
     finally:
@@ -140,7 +147,8 @@ def _dispatch(db: Rakho, args: argparse.Namespace) -> int:
             return 0
         print(f"stored {len(report.memories)}  refused {len(report.refusals)}")
         for mem in report.memories:
-            print(f"  keep  {mem.sensitivity:8}  {mem.content}")
+            dim = len(mem.embedding) if mem.embedding else 0
+            print(f"  keep  {mem.sensitivity:8}  {dim:>4}d  {mem.content}")
         for ref in report.refusals:
             print(f"  skip  {ref.reason:8}  {ref.preview}")
         return 0

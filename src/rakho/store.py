@@ -43,15 +43,12 @@ class Rakho:
         self,
         path: str | Path = "rakho.db",
         *,
-        gate: PolicyGate | None = None,
+        gate: PolicyGate | str | None = None,
         embedder: Embedder | str | None = None,
         storage: StorageEngine | None = None,
         allow_all: bool = False,
     ) -> None:
-        if allow_all:
-            self.gate: PolicyGate = gate or AllowAllGate()
-        else:
-            self.gate = gate or DefaultPolicyGate()
+        self.gate: PolicyGate = coerce_gate(gate, allow_all=allow_all)
         self.embedder = resolve_embedder(embedder)
         self.storage = storage or SQLiteEngine(path)
         self._seed_languages()
@@ -219,6 +216,23 @@ class Rakho:
 
     def dekho(self, **kwargs: Any) -> AuditReport:
         return self.audit(**kwargs)
+
+
+def coerce_gate(gate: PolicyGate | str | None, *, allow_all: bool = False) -> PolicyGate:
+    if isinstance(gate, PolicyGate):
+        return gate
+    if isinstance(gate, str):
+        key = gate.strip().lower()
+        if key in ("", "default"):
+            return AllowAllGate() if allow_all else DefaultPolicyGate()
+        if key == "sluice":
+            from rakho.sluice_gate import SluiceGate
+
+            return SluiceGate()
+        raise ValueError(f"unknown gate {gate!r}. use 'default' or 'sluice'")
+    if gate is None:
+        return AllowAllGate() if allow_all else DefaultPolicyGate()
+    raise TypeError(f"gate must be a PolicyGate, str, or None, not {type(gate).__name__}")
 
 
 def _require_actor(actor_id: str) -> str:

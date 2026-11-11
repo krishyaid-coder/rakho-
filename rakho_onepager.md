@@ -12,7 +12,7 @@ Rakho is a small embeddable database for **what an AI agent is allowed to rememb
 
 It is a library, not a server. Any developer can use it as their agent's memory. Sluice is not required. Sluice is one bouncer that can plug in later.
 
-It is **not** Sluice's SQLite. Sluice logs what the gate blocked (fingerprints, decisions). Rakho stores recallable notes ("Ankit's order is late") after a gate says they are safe.
+It is **not** Sluice's SQLite. Sluice logs what the gate blocked (fingerprints, decisions). Rakho stores recallable notes ("Krishy's order is late") after a gate says they are safe.
 
 v1 stores **episodes only** — raw notes, one owner each. No summaries, no extracted facts, no custom storage engine.
 
@@ -30,7 +30,7 @@ English is canonical. Hindi and German ship in the box. Anyone can add a languag
 | audit  | `audit` / `look` | `dekho` | `schau` / `zeig` |
 
 ```python
-db.keep(content, actor_id="ankit")
+db.keep(content, actor_id="krishy")
 db.learn("swahili", {"keep": "weka", "recall": "leta", "forget": "sahau", "audit": "angalia"})
 ```
 
@@ -94,20 +94,20 @@ v1 storage: SQLite + FTS5. Vectors as blobs; cosine in process. Swap the engine 
 
 ## v1 demo (the bar)
 
-1. Ankit: "my order is late. password is hunter2" → keep the order, refuse the password.
-2. Recall "order" for Ankit → late order, no password.
-3. Priya has her own note. Forget Ankit → his rows are gone, including refusals. Priya untouched.
-4. `audit(actor_id="ankit")` is empty.
+1. Krishy: "my order is late. password is hunter2" → keep the order, refuse the password.
+2. Recall "order" for Krishy → late order, no password.
+3. Priya has her own note. Forget Krishy → his rows are gone, including refusals. Priya untouched.
+4. `audit(actor_id="krishy")` is empty.
 
 Ship when that is boringly reliable.
 
 ---
 
-## Not in v1
+## Not in v1 / still not in 0.2
 
-Custom HNSW engine, derived facts/summaries, decay, multilingual PII beyond obvious patterns, natural-language sentences as queries.
+Custom HNSW engine, derived facts/summaries, decay, natural-language sentences as queries, hosted embeddings, a bundled embedding model.
 
-Sluice gate, MCP, and remote embeddings (Jina / HF) are optional extras. Default remains offline hash + built-in gate.
+Sluice gate, MCP, and remote embeddings (Jina / HF) are optional extras. Default remains offline hash + built-in gate. `gate="sluice"` is the enable step. The default gate covers English / Hindi / German secrets, Aadhaar, PAN, Steuer-ID, and injection-shaped lines.
 
 ---
 

@@ -17,7 +17,10 @@ class SluiceGate(PolicyGate):
     """
 
     def __init__(self, scanner: Callable[..., list[Any]] | None = None) -> None:
-        self._scan = scanner or _sluice_scan
+        if scanner is None:
+            _require_sluice()
+            scanner = _sluice_scan
+        self._scan = scanner
 
     def inspect(self, content: str, context: dict[str, Any] | None = None) -> Decision:
         if not content or not content.strip():
@@ -35,10 +38,14 @@ class SluiceGate(PolicyGate):
         ordered = sorted(hits, key=lambda h: getattr(h, "start", 0), reverse=True)
         for hit in ordered:
             detector = str(getattr(hit, "detector_id", getattr(hit, "label", "sluice")))
-            label = detector.split(".", 1)[-1].replace(" ", "_")
+            family = detector.split(".", 1)[0]
+            leaf = detector.split(".", 1)[-1].replace(" ", "_")
+            # Keep the family name for injection/poisoning so origin tagging
+            # can see prompt_injection, not just ignore_instructions.
+            label = family if family in _SKIP_PREFIXES else leaf
             if label not in labels:
                 labels.append(label)
-            if any(detector.startswith(p) or label.startswith(p) for p in _SKIP_PREFIXES):
+            if any(detector.startswith(p) or family.startswith(p) for p in _SKIP_PREFIXES):
                 skip = True
             start = int(getattr(hit, "start", 0))
             end = int(getattr(hit, "end", start))
@@ -60,19 +67,26 @@ class SluiceGate(PolicyGate):
         )
 
 
-def _sluice_scan(content: str, context: dict[str, Any]) -> list[Any]:
+def _require_sluice() -> None:
     try:
-        from sluice.detectors import pii, prompt_injection, secrets, tool_poisoning  # noqa: F401
-        from sluice.detectors.base import ScanContext, scan_all
+        import sluice  # noqa: F401
     except ImportError as exc:
         raise ImportError(
             "Sluice is not installed. pip install sluice-taint  "
             "(optional — Rakho's default gate works without it)"
         ) from exc
 
+
+def _sluice_scan(content: str, context: dict[str, Any]) -> list[Any]:
+    _require_sluice()
+    from sluice.detectors import pii, prompt_injection, secrets, tool_poisoning  # noqa: F401
+    from sluice.detectors.base import ScanContext, scan_all
+
+    # Keep is ingesting untrusted content (often a tool response). Sluice's
+    # prompt_injection detector only runs on response / tools/call.
     scan_ctx = ScanContext(
-        direction="request",
-        method="keep",
+        direction="response",
+        method="tools/call",
         tool=context.get("origin_tool") or "rakho",
         upstream="rakho",
         session_id=str(context.get("session_id") or "default"),

@@ -63,6 +63,7 @@ class Memory:
             "sensitivity": self.sensitivity,
             "metadata": self.metadata,
             "score": self.score,
+            "embedding_dim": len(self.embedding) if self.embedding else 0,
         }
 
 

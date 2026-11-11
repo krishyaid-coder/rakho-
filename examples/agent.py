@@ -25,27 +25,27 @@ def main() -> None:
     print("embedder:", type(db.embedder).__name__)
     print()
 
-    print("Ankit:", "my order is late")
-    print("agent:", handle(db, "ankit", "my order is late"))
+    print("Krishy:", "my order is late")
+    print("agent:", handle(db, "krishy", "my order is late"))
     print()
 
-    print("Ankit:", "password is hunter2")
-    print("agent:", handle(db, "ankit", "password is hunter2"))
+    print("Krishy:", "password is hunter2")
+    print("agent:", handle(db, "krishy", "password is hunter2"))
     print()
 
-    print("Ankit:", "what's the status of my order?")
-    print("agent:", handle(db, "ankit", "what's the status of my order?"))
+    print("Krishy:", "what's the status of my order?")
+    print("agent:", handle(db, "krishy", "what's the status of my order?"))
     print()
 
     print("Priya:", "I prefer email")
     print("agent:", handle(db, "priya", "I prefer email"))
     print()
 
-    print("forget Ankit…")
-    db.forget(actor_id="ankit")
-    empty = db.dekho(actor_id="ankit")
+    print("forget Krishy…")
+    db.forget(actor_id="krishy")
+    empty = db.dekho(actor_id="krishy")
     priya = db.dekho(actor_id="priya")
-    print("Ankit stored/refused:", len(empty.memories), len(empty.refusals))
+    print("Krishy stored/refused:", len(empty.memories), len(empty.refusals))
     print("Priya still has:", [m.content for m in priya.memories])
     db.close()
 

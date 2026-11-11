@@ -1,20 +1,39 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "rakho"
-version = "0.1.0"
+version = "0.2.0"
 description = "Agent memory that inspects before it keeps, and can prove what it forgot."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Rakho" }]
+keywords = ["agent", "memory", "sqlite", "privacy", "hindi", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Security",
+    "Typing :: Typed",
+]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/krishyaid-coder/rakho-"
+Repository = "https://github.com/krishyaid-coder/rakho-"
+Issues = "https://github.com/krishyaid-coder/rakho-/issues"
+
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "build>=1.2"]
 mcp = ["mcp>=1.2"]
-sluice = ["sluice-taint>=0.4"]
+sluice = ["sluice-taint>=0.3"]
 
 [project.scripts]
 rakho = "rakho.cli:main"
@@ -22,6 +41,9 @@ rakho-mcp = "rakho.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+rakho = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -23,13 +23,16 @@ class AllowAllGate(PolicyGate):
 
 
 _INJECTION = re.compile(
-    r"(ignore (all )?previous instructions"
-    r"|ignore (all )?prior instructions"
+    r"(ignore (all )?(previous|prior|above) instructions?"
     r"|forget (the |all )?safety"
     r"|disregard (your |the )?(rules|guidelines|safety)"
     r"|you are now (dan|jailbreak)"
     r"|override (the )?(system|safety) prompt"
-    r"|system prompt is)",
+    r"|system prompt is"
+    r"|ignoriere (alle )?(vorherigen?|bisherigen?|obigen?) anweisungen"
+    r"|vergiss (die )?(sicherheitsregeln|vorherigen? anweisungen)"
+    r"|पिछले निर्देशों को (अनदेखा|नज़रअंदाज़|नजरअंदाज)"
+    r"|पिछली (हिदायतों|निर्देशों) को (भूल|अनदेखा))",
     re.IGNORECASE,
 )
 
@@ -47,9 +50,15 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "password",
         re.compile(
-            r"\b(password|passwd|pwd|passphrase|secret|api[_-]?key|auth[_-]?token)\b\s*([:=]|is)\s*\S+",
+            r"\b(password|passwd|pwd|passphrase|secret|api[_-]?key|auth[_-]?token"
+            r"|passwort|kennwort|geheimnis|api[-_]?schl[uü]ssel)\b"
+            r"\s*([:=]|\bist\b|\bis\b)\s*\S+",
             re.IGNORECASE,
         ),
+    ),
+    (
+        "password",
+        re.compile(r"(पासवर्ड|कूटशब्द|गुप्त(?:शब्द|कोड)?)\s*(?:[:=]|है)?\s+\S+"),
     ),
 ]
 
@@ -57,6 +66,14 @@ _PII_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("pan", re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b")),
     ("iban", re.compile(r"\b[A-Z]{2}[0-9]{2}[A-Z0-9]{10,30}\b")),
     ("aadhaar", re.compile(r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b")),
+    (
+        "steuer_id",
+        re.compile(
+            r"(?i)(?:steuer(?:liche)?(?:\s|-)?(?:id(?:entifikationsnummer)?|"
+            r"identifikationsnummer)|idnr|steuernummer)"
+            r"\s*[:=]?\s*([1-9]\d{10}|\d{2}\s\d{3}\s\d{3}\s\d{3})"
+        ),
+    ),
     ("credit_card", re.compile(r"\b(?:\d[ -]*?){13,19}\b")),
 ]
 
@@ -122,6 +139,10 @@ class DefaultPolicyGate(PolicyGate):
                         return raw
                 if label == "iban" and len(re.sub(r"\s", "", raw)) < 15:
                     return raw
+                if label == "steuer_id":
+                    digits = re.sub(r"\D", "", raw)
+                    if len(digits) != 11 or digits.startswith("0"):
+                        return raw
                 return _MASK.format(label=label)
 
             new_text, n = pattern.subn(_sub, redacted)

@@ -26,7 +26,16 @@ __all__ = [
     "PolicyGate",
     "Rakho",
     "Refusal",
+    "SluiceGate",
     "auto_embedder",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
+
+
+def __getattr__(name: str):
+    if name == "SluiceGate":
+        from rakho.sluice_gate import SluiceGate
+
+        return SluiceGate
+    raise AttributeError(f"module 'rakho' has no attribute {name!r}")

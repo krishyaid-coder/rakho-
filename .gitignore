@@ -10,3 +10,4 @@ venv/
 *.db
 .DS_Store
 docs/assets/_preview/
+*.mp4

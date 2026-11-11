@@ -54,10 +54,11 @@ def render_banner() -> str:
 
 def render_hints() -> str:
     lines = [
-        "  rakho keep  --actor ankit \"order is late\"",
-        "  rakho nikaalo --actor ankit \"order\"",
-        "  rakho bhoolo --actor ankit",
-        "  rakho dekho --actor ankit",
+        "  rakho keep  --actor krishy \"order is late\"",
+        "  rakho nikaalo --actor krishy \"order\"",
+        "  rakho bhoolo --actor krishy",
+        "  rakho dekho --actor krishy",
+        "  rakho --gate sluice keep --actor krishy \"order is late\"",
     ]
     body = "\n".join(lines)
     if _color():

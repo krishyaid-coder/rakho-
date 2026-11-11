@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import os
+import ssl
 import struct
 import urllib.error
 import urllib.request
@@ -65,6 +66,16 @@ class HashingEmbedder(Embedder):
         return l2_normalize(vec)
 
 
+def _ssl_context() -> ssl.SSLContext:
+    """python.org macOS installs often ship with no CA bundle. Use certifi if present."""
+    try:
+        import certifi
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
 def _post_json(url: str, payload: dict[str, Any], headers: dict[str, str], timeout: float = 30) -> Any:
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
@@ -74,12 +85,19 @@ def _post_json(url: str, payload: dict[str, Any], headers: dict[str, str], timeo
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout, context=_ssl_context()) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"embed HTTP {exc.code} from {url}: {body[:400]}") from exc
     except urllib.error.URLError as exc:
+        reason = str(exc.reason)
+        if "CERTIFICATE_VERIFY_FAILED" in reason:
+            raise RuntimeError(
+                "embed SSL failed (macOS python.org has no CA bundle). "
+                "python3 -m pip install certifi   "
+                "or run Install Certificates.command in /Applications/Python 3.13/"
+            ) from exc
         raise RuntimeError(f"embed request failed: {exc.reason}") from exc
 
 
