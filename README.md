@@ -307,3 +307,9 @@ Tools: `keep` / `rakho`, `recall` / `nikaalo`, `forget` / `bhoolo`, `audit` / `d
 - Zero required runtime dependencies. SQLite on disk.
 
 Locked idea: [rakho_onepager.md](rakho_onepager.md).
+
+## Next
+
+`nikaalo` can drop notes that do not fit the 512-token bag and not tell you. Next cut: say when that happened, then page the **same** query. Not a dollar dashboard, not leftover notes dumped into the next unrelated call.
+
+Proposal (open for comment): [docs/rfc-nikaalo-budget.md](docs/rfc-nikaalo-budget.md).

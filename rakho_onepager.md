@@ -107,6 +107,8 @@ Ship when that is boringly reliable.
 
 Custom HNSW engine, derived facts/summaries, decay, natural-language sentences as queries, hosted embeddings, a bundled embedding model.
 
+Recall already packs to a token budget and **drops the rest silently**. Proposed next: tell the caller, then page the same query. Not auto-rollover, not dollar cost. [docs/rfc-nikaalo-budget.md](docs/rfc-nikaalo-budget.md).
+
 Sluice gate, MCP, and remote embeddings (Jina / HF) are optional extras. Default remains offline hash + built-in gate. `gate="sluice"` is the enable step. The default gate covers English / Hindi / German secrets, Aadhaar, PAN, Steuer-ID, and injection-shaped lines.
 
 ---
