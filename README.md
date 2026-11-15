@@ -203,7 +203,19 @@ rakho --db memory.db bhoolo --actor krishy
 rakho --db memory.db dekho --actor krishy
 ```
 
-Empty stored + empty refused means it actually forgot, including the vectors.
+Stored notes should be gone (including vectors). Refusals and a forget event stay so you can prove it. `bhoolo` prints `checkpoint completed` or `checkpoint requested` — requested is not the same as the WAL frames being gone.
+
+## What forget does not cover
+
+`bhoolo` is a real delete **inside this SQLite file's live store**. It is not a legal erase of the universe.
+
+- WAL / unused pages: a long-running reader can keep a checkpoint from finishing. The file can still hold old bytes until it completes.
+- Backups and replicas taken before the forget. Rakho cannot reach them.
+- Anything already handed to a model, printed, or logged.
+
+The gate lowers risk. It does not certify text as safe.
+
+Full write-up: [docs/forget-limits.md](docs/forget-limits.md).
 
 ## Demo agent: PayPal invoices
 

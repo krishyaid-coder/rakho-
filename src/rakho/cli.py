@@ -136,8 +136,14 @@ def _dispatch(db: Rakho, args: argparse.Namespace) -> int:
         payload = {
             "memories_deleted": result.memories_deleted,
             "refusals_deleted": result.refusals_deleted,
+            "memories_orphaned": result.memories_orphaned,
+            "checkpoint": result.checkpoint_public(),
         }
-        print(json.dumps(payload) if args.json else f"forgot {result.deleted} rows")
+        if args.json:
+            print(json.dumps(payload))
+        else:
+            ck = "completed" if result.checkpoint_completed else "requested"
+            print(f"forgot {result.deleted} rows  checkpoint {ck}")
         return 0
 
     if action == "audit":

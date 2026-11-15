@@ -38,6 +38,8 @@ def bind_tools(store: Rakho) -> dict[str, ToolFn]:
             {
                 "memories_deleted": result.memories_deleted,
                 "refusals_deleted": result.refusals_deleted,
+                "memories_orphaned": result.memories_orphaned,
+                "checkpoint": result.checkpoint_public(),
             }
         )
 

@@ -133,10 +133,24 @@ class ForgetResult:
     memories_deleted: int
     refusals_deleted: int = 0
     memories_orphaned: int = 0
+    checkpoint_requested: bool = False
+    checkpoint_completed: bool = False
+    checkpoint_busy: int = 0
+    checkpoint_log: int = 0
+    checkpoint_checkpointed: int = 0
 
     @property
     def deleted(self) -> int:
         return self.memories_deleted + self.refusals_deleted
+
+    def checkpoint_public(self) -> dict[str, Any]:
+        return {
+            "requested": self.checkpoint_requested,
+            "completed": self.checkpoint_completed,
+            "busy": self.checkpoint_busy,
+            "log_frames": self.checkpoint_log,
+            "checkpointed_frames": self.checkpoint_checkpointed,
+        }
 
 
 @dataclass

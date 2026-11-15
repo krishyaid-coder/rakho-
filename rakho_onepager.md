@@ -42,8 +42,8 @@ Commands are a dictionary. The database does not change.
 
 1. **Gate first, embed after.** Default gate is on (secrets, obvious PII, injection-shaped content). Fail closed. No-op exists for tests only.
 2. **Every write needs `actor_id`.** `scope` defaults to `"default"`. Recall cannot cross that boundary.
-3. **Forget is a real delete** (row + FTS + embedding). `forget()` with no target is refused.
-4. **Audit shows stored and refused.** Refusals never contain the secret itself — only a mask and a reason.
+3. **Forget is a real delete** of notes (row + FTS + embedding). `forget()` with no target is refused. It reports WAL checkpoint requested vs completed. It does not reach backups or copies already recalled. [docs/forget-limits.md](docs/forget-limits.md).
+4. **Audit shows stored, refused, and mutation events.** Refusals never contain the secret itself — only a mask and a reason.
 5. **Episodes only.** No `kind: summary` until lineage exists.
 
 ---

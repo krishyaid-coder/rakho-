@@ -215,10 +215,16 @@ class Rakho:
                 },
             )
         )
+        busy, log_frames, checkpointed = self.storage.wal_checkpoint()
         return ForgetResult(
             memories_deleted=memories_deleted,
             refusals_deleted=refusals_deleted,
             memories_orphaned=len(orphaned),
+            checkpoint_requested=True,
+            checkpoint_completed=busy == 0,
+            checkpoint_busy=busy,
+            checkpoint_log=log_frames,
+            checkpoint_checkpointed=checkpointed,
         )
 
     def audit(self, *, actor_id: str, scope: str | None = None) -> AuditReport:

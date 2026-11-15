@@ -434,6 +434,16 @@ class SQLiteEngine(StorageEngine):
         self._conn.commit()
         return memories_deleted, refusals_deleted, orphaned
 
+    def wal_checkpoint(self) -> tuple[int, int, int]:
+        """Ask SQLite to fold the WAL. Returns (busy, log_frames, checkpointed).
+
+        busy=1 means a reader still holds the old frames (requested, not completed).
+        """
+        row = self._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+        if row is None:
+            return (1, 0, 0)
+        return (int(row[0]), int(row[1]), int(row[2]))
+
     def _orphan_derived(self, deleted_ids: list[str]) -> list[str]:
         if not deleted_ids:
             return []
