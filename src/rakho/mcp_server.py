@@ -28,9 +28,18 @@ def bind_tools(store: Rakho) -> dict[str, ToolFn]:
             }
         )
 
-    def recall(query: str, actor_id: str, scope: str = "default", k: int = 8) -> str:
-        hits = store.recall(query, actor_id=actor_id, scope=scope, k=k)
-        return json.dumps([{"content": m.content, "score": m.score} for m in hits])
+    def recall(
+        query: str,
+        actor_id: str,
+        scope: str = "default",
+        k: int = 8,
+        budget: int = 512,
+        cursor: str | None = None,
+    ) -> str:
+        hits = store.recall(
+            query, actor_id=actor_id, scope=scope, k=k, budget=budget, cursor=cursor
+        )
+        return json.dumps(hits.to_public_dict(), ensure_ascii=False)
 
     def forget(actor_id: str, scope: str | None = None) -> str:
         result = store.forget(actor_id=actor_id, scope=scope)
@@ -47,6 +56,12 @@ def bind_tools(store: Rakho) -> dict[str, ToolFn]:
             ensure_ascii=False,
         )
 
+    def graph(query: str, actor_id: str, scope: str = "default", k: int = 8, budget: int = 512) -> str:
+        return json.dumps(
+            store.graph(query, actor_id=actor_id, scope=scope, k=k, budget=budget).to_public_dict(),
+            ensure_ascii=False,
+        )
+
     return {
         "keep": keep,
         "rakho": keep,
@@ -56,6 +71,7 @@ def bind_tools(store: Rakho) -> dict[str, ToolFn]:
         "bhoolo": forget,
         "audit": audit,
         "dekho": audit,
+        "graph": graph,
     }
 
 
@@ -80,6 +96,10 @@ def create_mcp(store: Rakho) -> Any:
     mcp.tool(name="bhoolo", description="Hindi: forget an actor.")(tools["bhoolo"])
     mcp.tool(name="audit", description="Show stored and refused memories.")(tools["audit"])
     mcp.tool(name="dekho", description="Hindi: audit memories.")(tools["dekho"])
+    mcp.tool(
+        name="graph",
+        description="Mermaid of this actor's recall: packed, skipped, orphaned, forgotten ids.",
+    )(tools["graph"])
     return mcp
 
 

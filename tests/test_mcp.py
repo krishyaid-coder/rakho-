@@ -25,8 +25,10 @@ def test_mcp_tools_keep_recall_forget_audit(tools):
     assert "hunter2" not in skipped.get("preview", "")
 
     hits = json.loads(tools["nikaalo"]("order", "krishy"))
-    assert hits
-    assert all("hunter2" not in h["content"] for h in hits)
+    notes = hits["memories"] if isinstance(hits, dict) else hits
+    assert notes
+    assert all("hunter2" not in h["content"] for h in notes)
+    assert hits["skipped"] == 0
 
     report = json.loads(tools["dekho"]("krishy"))
     assert report["stored_count"] >= 1
@@ -55,4 +57,5 @@ def test_mcp_tool_names(tmp_path):
         "bhoolo",
         "audit",
         "dekho",
+        "graph",
     }

@@ -34,12 +34,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--source")
     parser.add_argument("--k", type=int, default=8)
     parser.add_argument("--budget", type=int, default=512)
+    parser.add_argument("--cursor", help="continue the same nikaalo query from a previous page")
     parser.add_argument("--id", dest="memory_id", help="memory id for forget")
     parser.add_argument("--keep", dest="v_keep", help="learn: keep verb")
     parser.add_argument("--recall", dest="v_recall", help="learn: recall verb")
     parser.add_argument("--forget", dest="v_forget", help="learn: forget verb")
     parser.add_argument("--audit", dest="v_audit", help="learn: audit verb")
     parser.add_argument("--json", action="store_true", help="print JSON")
+    parser.add_argument(
+        "--graph",
+        action="store_true",
+        help="dekho: ASCII map of this actor's recall (query in the rest args)",
+    )
+    parser.add_argument(
+        "--mermaid",
+        action="store_true",
+        help="dekho --graph: print mermaid source instead of the CLI picture",
+    )
     parser.add_argument(
         "--embedder",
         default="hash",
@@ -114,13 +125,18 @@ def _dispatch(db: Rakho, args: argparse.Namespace) -> int:
 
     if action == "recall":
         query = " ".join(args.rest).strip()
-        hits = db.recall(
-            query,
-            actor_id=args.actor,
-            scope=args.scope or "default",
-            k=args.k,
-            budget=args.budget,
-        )
+        try:
+            hits = db.recall(
+                query,
+                actor_id=args.actor,
+                scope=args.scope or "default",
+                k=args.k,
+                budget=args.budget,
+                cursor=args.cursor,
+            )
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
         return _print_recall(hits, as_json=args.json)
 
     if action == "forget":
@@ -141,6 +157,20 @@ def _dispatch(db: Rakho, args: argparse.Namespace) -> int:
         return 0
 
     if action == "audit":
+        if args.graph:
+            query = " ".join(args.rest).strip()
+            report = db.graph(
+                query,
+                actor_id=args.actor,
+                scope=args.scope or "default",
+                k=args.k,
+                budget=args.budget,
+            )
+            if args.json:
+                print(json.dumps(report.to_public_dict(), indent=2, ensure_ascii=False))
+                return 0
+            print(report.mermaid if args.mermaid else report.ascii, end="")
+            return 0
         report = db.audit(actor_id=args.actor, scope=args.scope)
         if args.json:
             print(json.dumps(report.to_public_dict(), indent=2, ensure_ascii=False))
@@ -200,15 +230,21 @@ def _print_keep(result: Any, *, as_json: bool) -> int:
     return 0
 
 
-def _print_recall(hits: list[Any], *, as_json: bool) -> int:
+def _print_recall(hits: Any, *, as_json: bool) -> int:
     if as_json:
-        print(json.dumps([m.to_public_dict() for m in hits], indent=2, ensure_ascii=False))
+        print(json.dumps(hits.to_public_dict(), indent=2, ensure_ascii=False))
         return 0
     if not hits:
         print("(nothing)")
+        if hits.skipped:
+            print(f"packed {hits.packed_tokens}/{hits.budget}  skipped {hits.skipped}  more=yes")
         return 0
     for mem in hits:
         print(f"{mem.score:.3f}  {mem.content}")
+    more = "yes" if hits.more else "no"
+    print(f"packed {hits.packed_tokens}/{hits.budget}  skipped {hits.skipped}  more={more}")
+    if hits.cursor:
+        print(f"cursor {hits.cursor}")
     return 0
 
 
