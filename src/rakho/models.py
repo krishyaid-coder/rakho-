@@ -49,6 +49,9 @@ class Memory:
     scope: str = "default"
     metadata: dict[str, Any] = field(default_factory=dict)
     score: float = 0.0
+    vec_score: float = 0.0
+    fts_score: float = 0.0
+    recency_score: float = 0.0
     embedder: str | None = None
     trust: Trust = "trusted"
 
@@ -67,6 +70,9 @@ class Memory:
             "sensitivity": self.sensitivity,
             "metadata": self.metadata,
             "score": self.score,
+            "vec_score": self.vec_score,
+            "fts_score": self.fts_score,
+            "recency_score": self.recency_score,
             "embedding_dim": len(self.embedding) if self.embedding else 0,
             "embedder": self.embedder,
             "trust": self.trust,
@@ -117,6 +123,51 @@ class Mutation:
         }
 
 
+class RecallResult(list):
+    """Ranked notes that fit the token bag, plus the truth about what did not.
+
+    Still a list, so `for m in db.nikaalo(...)` and `== []` keep working.
+    """
+
+    packed_tokens: int
+    budget: int
+    skipped: int
+    cursor: str | None
+    held_back: list[Memory]
+
+    def __init__(
+        self,
+        memories: list[Memory] | None = None,
+        *,
+        packed_tokens: int = 0,
+        budget: int = 0,
+        skipped: int = 0,
+        cursor: str | None = None,
+        held_back: list[Memory] | None = None,
+    ) -> None:
+        super().__init__(memories or [])
+        self.packed_tokens = packed_tokens
+        self.budget = budget
+        self.skipped = skipped
+        self.cursor = cursor
+        self.held_back = held_back or []
+
+    @property
+    def more(self) -> bool:
+        return bool(self.cursor)
+
+    def to_public_dict(self) -> dict[str, Any]:
+        return {
+            "memories": [m.to_public_dict() for m in self],
+            "packed_tokens": self.packed_tokens,
+            "budget": self.budget,
+            "skipped": self.skipped,
+            "cursor": self.cursor,
+            "more": self.more,
+            "held_back": [m.to_public_dict() for m in self.held_back],
+        }
+
+
 @dataclass
 class KeepResult:
     action: Action
@@ -137,6 +188,42 @@ class ForgetResult:
     @property
     def deleted(self) -> int:
         return self.memories_deleted + self.refusals_deleted
+
+
+@dataclass
+class GraphReport:
+    """One actor, one look at how recall ranked and what left the box."""
+
+    actor_id: str
+    query: str
+    mermaid: str
+    ascii: str = ""
+    packed: list[Memory] = field(default_factory=list)
+    skipped: list[Memory] = field(default_factory=list)
+    unranked: list[Memory] = field(default_factory=list)
+    refused: list[Refusal] = field(default_factory=list)
+    orphaned: list[Memory] = field(default_factory=list)
+    forgotten_ids: list[str] = field(default_factory=list)
+    packed_tokens: int = 0
+    budget: int = 512
+    scope: str = "default"
+
+    def to_public_dict(self) -> dict[str, Any]:
+        return {
+            "actor_id": self.actor_id,
+            "scope": self.scope,
+            "query": self.query,
+            "mermaid": self.mermaid,
+            "ascii": self.ascii,
+            "packed": [m.to_public_dict() for m in self.packed],
+            "skipped": [m.to_public_dict() for m in self.skipped],
+            "unranked": [m.to_public_dict() for m in self.unranked],
+            "refused": [r.to_public_dict() for r in self.refused],
+            "orphaned": [m.to_public_dict() for m in self.orphaned],
+            "forgotten_ids": self.forgotten_ids,
+            "packed_tokens": self.packed_tokens,
+            "budget": self.budget,
+        }
 
 
 @dataclass

@@ -136,7 +136,7 @@ class StorageEngine(ABC):
         scope: str | None = None,
         session_id: str | None = None,
         id: str | None = None,
-    ) -> tuple[int, int, list[str]]:
+    ) -> tuple[int, int, list[str], list[str]]:
         raise NotImplementedError
 
     def put_mutation(self, mutation: Mutation) -> None:
@@ -344,6 +344,9 @@ class SQLiteEngine(StorageEngine):
                 continue
             age_hours = max(0.0, (now - mem.created_at).total_seconds() / 3600.0)
             recency = 1.0 / (1.0 + age_hours / 24.0)
+            mem.vec_score = vec_score
+            mem.fts_score = fts_score
+            mem.recency_score = recency
             mem.score = 0.5 * vec_score + 0.3 * fts_score + 0.2 * recency
             scored.append(mem)
 
@@ -394,7 +397,7 @@ class SQLiteEngine(StorageEngine):
         scope: str | None = None,
         session_id: str | None = None,
         id: str | None = None,
-    ) -> tuple[int, int, list[str]]:
+    ) -> tuple[int, int, list[str], list[str]]:
         where: list[str] = []
         params: list[Any] = []
         if id:
@@ -432,7 +435,7 @@ class SQLiteEngine(StorageEngine):
         refusals_deleted = 0
         orphaned = self._orphan_derived(ids)
         self._conn.commit()
-        return memories_deleted, refusals_deleted, orphaned
+        return memories_deleted, refusals_deleted, orphaned, ids
 
     def _orphan_derived(self, deleted_ids: list[str]) -> list[str]:
         if not deleted_ids:

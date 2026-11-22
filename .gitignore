@@ -12,3 +12,4 @@ venv/
 docs/assets/_preview/
 *.mp4
 !docs/assets/rakho-usecase.mp4
+!docs/assets/dekho-graph.mp4

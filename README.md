@@ -179,10 +179,36 @@ rakho --db memory.db dekho --actor krishy --json
 
 You should see `256d` next to each kept note (vector length). The vector itself stays in SQLite; audit never prints it.
 
+**How a recall ranked** (this actor only — never Priya’s notes):
+
+<p align="center">
+  <img src="docs/assets/dekho-graph.gif" alt="dekho --graph: packed bag, didn't rank, refused at the door" width="520">
+</p>
+
+```bash
+rakho --db memory.db dekho --actor krishy --graph "order is late"
+```
+
+Draws a tree in the terminal. The query box shows the **token bag** (`packed 48/512 · skipped 0`). Below: **packed** vs **skipped · bag full** with vector / keyword / recency, notes that **didn't rank**, **refused** at the door (preview only — never the secret), **orphaned** notes `dekho` can still see, and **forgotten** ids after `bhoolo` (row and vector gone — the receipt, not the secret). Terminals cannot render mermaid; that source is `--mermaid` or `.mermaid` for GitHub.
+
+```python
+print(db.graph("invoice", actor_id="krishy").ascii)     # CLI picture
+print(db.graph("invoice", actor_id="krishy").mermaid)   # paste into GitHub
+```
+
 **Recall** (needs the same embedder you wrote with):
 
 ```bash
 rakho --db memory.db --embedder jina nikaalo --actor krishy "order is late"
+```
+
+`nikaalo` packs hits into a token bag (default 512). If some notes do not fit, it **says so** (`packed 300/512  skipped 2  more=yes`) and prints a cursor. Pass `--cursor` with the **same query** to get the next page. It will not dump leftovers into a different question.
+
+```python
+page = db.nikaalo("invoice", actor_id="krishy", budget=64)
+print(page.skipped, page.more)
+if page.cursor:
+    rest = db.nikaalo("invoice", actor_id="krishy", budget=64, cursor=page.cursor)
 ```
 
 **Raw SQLite** — embeddings are a float32 blob; `length/4` is the dimension:
@@ -295,7 +321,7 @@ rakho-mcp --db memory.db --embedder auto
 rakho-mcp --db memory.db --gate sluice
 ```
 
-Tools: `keep` / `rakho`, `recall` / `nikaalo`, `forget` / `bhoolo`, `audit` / `dekho`.
+Tools: `keep` / `rakho`, `recall` / `nikaalo`, `forget` / `bhoolo`, `audit` / `dekho`, `graph`.
 
 ## v0.2
 
